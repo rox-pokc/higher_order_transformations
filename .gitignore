@@ -1,0 +1,22 @@
+# Ignore Julia package environment
+.julia/
+Manifest.toml
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore compiled files
+*.ji
+*.so
+*.dylib
+*.dll
+
+# Ignore temporary files
+*~
+*.log
+
+# macOS system files
+.DS_Store
+
+# macOS specific folders
+__MACOSX/
