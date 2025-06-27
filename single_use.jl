@@ -89,7 +89,13 @@ function random_unitary(dim::Int; real::Bool=false)
     d = diag(R)
     phases = d ./ abs.(d)
     phases[isnan.(phases)] .= 1
-    return Q * Diagonal(phases)
+    Q = Q * Diagonal(phases)
+
+    detQ = det(Q)
+    correction = (detQ + 0im)^(-1/dim)
+    Q = Q * correction
+
+    return Q
 end
 
 function tensor_power(U::AbstractMatrix, k::Int)
@@ -137,26 +143,29 @@ function minimal_stinespring_from_choi(C::AbstractMatrix)
     d_i = d_o = Int(d)   # assume square dims
 
     # Build the purification |ψ⟩ = ∑ √λ_k |e_k⟩ ⊗ |k⟩
-    psi = zeros(ComplexF64, d_i, d_o, r)
+    pure_vecs = zeros(ComplexF64, d_i, d_o, r)
     for (k, λ) in enumerate(eigen_vals)
         e_k = eigen_vecs[:, k]
         e_k_tensor = reshape(e_k, d_o, d_i)
-        psi[:, :, k] .= sqrt(λ) * permutedims(e_k_tensor, (2, 1))  # reorder to H_i ⊗ H_o
+        pure_vecs[:, :, k] .= sqrt(λ) * permutedims(e_k_tensor, (2, 1))  # reorder to H_i ⊗ H_o
     end
 
     # Reshape into a matrix: V: H_i → H_o ⊗ H_a
-    V = reshape(permutedims(psi, (2, 3, 1)), d_o * r, d_i)
+    V = reshape(permutedims(pure_vecs, (2, 3, 1)), d_o * r, d_i)
 
 
     C_reconstructed = zeros(ComplexF64, d_o * d_i, d_o * d_i)
     for k in 1:r
-        v = vec(psi[:, :, k])
+        v = vec(pure_vecs[:, :, k])
         C_reconstructed += v * v'  # outer product
     end
 
     println(isapprox(C, C_reconstructed; atol=1e-10))
 
-    return psi, V
+
+    Kraus_ops = [pure_vecs[:, :, k] / sqrt(eigen_vals[k]) for k in 1:r]
+
+    return pure_vecs, V, Kraus_ops
 end
 
 function svd_decomposition(V::AbstractMatrix)
@@ -192,7 +201,7 @@ end
 
 function solve_sample()
     model = Model(Mosek.Optimizer)
-    set_optimizer_attribute(model, MOI.Silent(), true)
+    # set_optimizer_attribute(model, MOI.Silent(), true)
 
     @variable(model, S[1:d^4, 1:d^4], PSD)
     @variable(model, F[1:d^4, 1:d^4], PSD)
@@ -219,6 +228,9 @@ function solve_sample()
     @objective(model, Max, p)
 
     optimize!(model)
+    println(termination_status(model))
+    println(primal_status(model))
+    println(dual_status(model))
 
     return value.(S), value.(C), value(p)
 end
@@ -273,17 +285,30 @@ show(stdout, "text/plain", get_choi(conj(U_rand), d))
 println("1st: ", isapprox(partial_trace(instrument, [4]), kron(partial_trace(instrument, [3, 4]),  I(d) / d)))
 println("2nd: ", isapprox(partial_trace(instrument, [2, 3, 4]), I(d) * d))
 
-psi, V = minimal_stinespring_from_choi(S_opt)
+pure_vecs, V, Kraus_ops = minimal_stinespring_from_choi(S_opt)
 
-println("Purification vector shape: ", size(psi))   # (d_in, d_out, d_a)
-show(stdout, "text/plain", threshold_zero(psi))
+println("Purification vector shape: ", size(pure_vecs))   # (d_in, d_out, d_a)
+show(stdout, "text/plain", threshold_zero(pure_vecs))
 println()
 println("Isometry shape: ", size(V))                # (d_out * d_a, d_in)
 show(stdout, "text/plain", threshold_zero(V))
 println()
 
+println("Kraus: ", size(Kraus_ops))                
+show(stdout, "text/plain", threshold_zero(Kraus_ops[1]))
+println()
+
 println("Choi of sigma_y: ", size(sigma_y_choi))
 show(stdout, "text/plain", threshold_zero(sigma_y_choi))
+println()
+
+Q, R = qr(V)  
+println("Q of V: ")
+show(stdout, "text/plain", threshold_zero(Matrix(Q)))
+println()
+
+println("R of V: ")
+show(stdout, "text/plain", threshold_zero(R))
 println()
 
 H = (sigma_x + sigma_z) / sqrt(2)
@@ -306,3 +331,54 @@ println()
 println("Vt: ")
 show(stdout, "text/plain", threshold_zero(Vt))
 println()
+
+
+# instrument
+
+S1 = kron(I(d), I(d), sigma_x, sigma_x)
+println(isapprox(S1 * C_opt * transpose(S1), C_opt))
+
+S2 = kron(I(d), I(d), sigma_z, sigma_z)
+println(isapprox(S2 * C_opt * transpose(S2), C_opt))
+
+S3 = kron(sigma_x, sigma_x, I(d), I(d))
+println(isapprox(S3 * C_opt * transpose(S3), C_opt))
+
+S4 = kron(sigma_z, sigma_z, I(d), I(d))
+println(isapprox(S4 * C_opt * transpose(S4), C_opt))
+
+
+H = (1 / sqrt(2)) * [1  1; 1 -1]
+println(det(H))
+choi_H_func = get_choi(conj(H), d)
+show(stdout, "text/plain", threshold_zero(choi_H_func))
+println()
+
+stab1 = kron(sigma_x, sigma_z)
+println(isapprox(stab1 * choi_H_func * transpose(stab1), choi_H_func))
+
+stab2 = kron(sigma_z, sigma_x)
+println(isapprox(stab2 * choi_H_func * transpose(stab2), choi_H_func))
+
+S = [1 0; 0 im]
+println(det(S))
+
+choi_S_func = get_choi(conj(S), d)
+show(stdout, "text/plain", threshold_zero(choi_S_func))
+println()
+
+stab3 = kron(sigma_y, sigma_x)
+println(isapprox(stab3 * choi_S_func * transpose(stab3), (-1) * choi_S_func))
+show(stdout, "text/plain", threshold_zero(stab3 * choi_S_func * transpose(stab3)))
+println()
+
+stab4 = kron(sigma_z, sigma_z)
+println(isapprox(stab4 * choi_S_func * transpose(stab4), choi_S_func))
+
+show(stdout, "text/plain", threshold_zero(sigma_y * (im * H) * sigma_y))
+println()
+
+show(stdout, "text/plain", conj(im * H))
+println()
+
+println(det(im * H))
