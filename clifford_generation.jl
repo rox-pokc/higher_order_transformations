@@ -1,18 +1,5 @@
 using Combinatorics
 
-X = [0 1; 1 0]
-Y = [0 -im; im 0]
-Z = [1 0; 0 -1]
-I = [1 0; 0 1]
-S = [1 0; 0 im]
-H = (1 / sqrt(2)) * [1  1; 1 -1]
-
-const CLIFFORD_MATRICES = Dict(
-    "H" => H,
-    "S" => S,
-    "I" => I
-)
-
 # Represent a signed Pauli operator
 struct Pauli1Q
     x::Int  # 0 or 1
@@ -59,7 +46,7 @@ function act_on_XZ(seq::Vector{String})
 end
 
 # Generate unique Clifford actions up to global phase
-function generate_cliffords_full(depth::Int)
+function generate_cliffords(depth::Int)
     seen = Dict{Tuple{Pauli1Q, Pauli1Q}, Vector{String}}()
     gates = ["I", "H", "S"]
 
@@ -73,23 +60,25 @@ function generate_cliffords_full(depth::Int)
     return seen
 end
 
-cliffs = generate_cliffords_full(6)
+# GENERATION EXAMPLE
 
-global yes = 0
-global no = 0
-for ((px, pz), seq) in cliffs
-    println("X ↦ $(string_of(px)), Z ↦ $(string_of(pz))  ←  ", join(seq, " → "))
-    U_arr = reverse([CLIFFORD_MATRICES[c] for c in seq])
-    U_combined = reduce(*, U_arr)
-    show(stdout, "text/plain", U_combined)
-    println()
-    if conj(U_combined) == U_combined
-        global yes += 1
-    else
-        global no += 1
-    end
-end
-println("YES: ", yes)
-println("NO: ", no)
+# cliffs = generate_cliffords(6)
 
-println("\nTotal unique Clifford operations: ", length(cliffs))
+# global yes = 0
+# global no = 0
+# for ((px, pz), seq) in cliffs
+#     println("X ↦ $(string_of(px)), Z ↦ $(string_of(pz))  ←  ", join(seq, " → "))
+#     U_arr = reverse([CLIFFORD_MATRICES[c] for c in seq])
+#     U_combined = reduce(*, U_arr)
+#     show(stdout, "text/plain", U_combined)
+#     println()
+#     if conj(U_combined) == U_combined
+#         global yes += 1
+#     else
+#         global no += 1
+#     end
+# end
+# println("YES: ", yes)
+# println("NO: ", no)
+
+# println("\nTotal unique Clifford operations: ", length(cliffs))

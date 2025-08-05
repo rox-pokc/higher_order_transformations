@@ -1,33 +1,10 @@
 using QuantumClifford
 using LinearAlgebra
-include("test.jl")  # gate sequence generator
 
-# Gate map
-const CLIFFORD_GATES = Dict(
-    "H" => sHadamard,
-    "S" => sPhase,
-    "I" => sId1
-)
+include("clifford_generation.jl")  # gate sequence generator
 
-X = [0 1; 1 0]
-Y = [0 -im; im 0]
-Z = [1 0; 0 -1]
-I = [1 0; 0 1]
-S = [1 0; 0 im]
-H = (1 / sqrt(2)) * [1  1; 1 -1]
-
-const PAULI_GATES = Dict(
-    'I' => I,
-    'X' => X,
-    'Y' => Y,
-    'Z' => Z
-)
-
-const CLIFFORD_MATRICES = Dict(
-    "H" => H,
-    "S" => S,
-    "I" => I
-)
+include("src/Config.jl")
+using .Config  
 
 mutable struct Comb
     stab::Stabilizer
@@ -71,7 +48,7 @@ function apply_comb(U, func::Function, d)
     comb = Comb(stab, [], [])
 
     # Get generated gate sequences
-    results = generate_cliffords_full(6)
+    results = generate_cliffords(6)
 
     enc_target_qubit = 5
     enc_comb_array = []
@@ -266,7 +243,7 @@ end
 d = 2
 
 arrays = []
-results = generate_cliffords_full(6)
+results = generate_cliffords(6)
 for ((px, pz), seq) in results
     push!(arrays, apply_comb(seq, inv, d))
 end

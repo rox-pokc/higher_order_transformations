@@ -1,5 +1,4 @@
 using QuantumClifford
-include("symplectic_generation.jl")
 
 # Initialize сircuit
 stab = S"XXIIIIII
