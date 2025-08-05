@@ -1,4 +1,5 @@
 using QuantumClifford
+include("symplectic_generation.jl")
 
 # Initialize сircuit
 stab = S"XXIIIIII
@@ -13,10 +14,12 @@ stab = S"XXIIIIII
 # Encode
 enc = sY
 apply!(stab, enc(5))
+println(stab)
 
 # Bell measure 3rd and 5th qubits
 x3x5 = project!(stab, P"IIXIXIII")[1]
 z3z5 = project!(x3x5, P"IIZIZIII")[1]
+println(z3z5)
 
 # Decode
 dec = sY
