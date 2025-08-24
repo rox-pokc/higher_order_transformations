@@ -1,5 +1,8 @@
 using Combinatorics
 
+# include("src/Config.jl")
+# using .Config  
+
 # Represent a signed Pauli operator
 struct Pauli1Q
     x::Int  # 0 or 1
@@ -67,8 +70,9 @@ end
 # global yes = 0
 # global no = 0
 # for ((px, pz), seq) in cliffs
-#     println("X ↦ $(string_of(px)), Z ↦ $(string_of(pz))  ←  ", join(seq, " → "))
-#     U_arr = reverse([CLIFFORD_MATRICES[c] for c in seq])
+#     println("X ↦ $(string_of(px)), Z ↦ $(string_of(pz))  ←  ", seq)
+#     # println("X ↦ $(string_of(px)), Z ↦ $(string_of(pz))  ←  ", join(seq, " → "))
+#     U_arr = [CLIFFORD_MATRICES[c] for c in seq]
 #     U_combined = reduce(*, U_arr)
 #     show(stdout, "text/plain", U_combined)
 #     println()

@@ -10,11 +10,16 @@ Z = [1 0; 0 -1]
 I = [1 0; 0 1]
 S = [1 0; 0 im]
 H = (1 / sqrt(2)) * [1  1; 1 -1]
+CNOT = [1 0 0 0;
+        0 1 0 0;
+        0 0 0 1;
+        0 0 1 0]
 
 const CLIFFORD_GATES = Dict(
     "H" => sHadamard,
     "S" => sPhase,
-    "I" => sId1
+    "I" => sId1,
+    "CNOT" => (ctrl::Int, trgt::Int) -> sCNOT(ctrl, trgt)
 )
 
 const PAULI_GATES = Dict(
@@ -27,7 +32,8 @@ const PAULI_GATES = Dict(
 const CLIFFORD_MATRICES = Dict(
     "H" => H,
     "S" => S,
-    "I" => I
+    "I" => I,
+    "CNOT" => CNOT
 )
 
 end

@@ -1,0 +1,118 @@
+Start:
+Done U in seconds: 154.016643083
+0
+[("S", 1), ("S", 1), ("S", 1), ("H", 1), ("S", 1), ("H", 1)]
+Done U in seconds: 152.408222708
+0
+[("H", 1), ("S", 1), ("H", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 134.74879875
+0
+[("H", 1), ("S", 1), ("S", 1), ("H", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 134.849931375
+0
+[("S", 1), ("S", 1), ("S", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 148.933681667
+0
+[("S", 1), ("S", 1), ("H", 1), ("S", 1), ("S", 1), ("I", 1)]
+Done U in seconds: 152.843635083
+0
+[("H", 1), ("S", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 152.371330875
+0
+[("S", 1), ("H", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 149.315963708
+0
+[("H", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 133.62454425
+0
+[("S", 1), ("H", 1), ("S", 1), ("S", 1), ("H", 1), ("I", 1)]
+Done U in seconds: 154.266191666
+0
+[("S", 1), ("H", 1), ("S", 1), ("H", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 154.796818
+0
+[("S", 1), ("S", 1), ("S", 1), ("H", 1), ("S", 1), ("I", 1)]
+Done U in seconds: 135.387994417
+0
+[("S", 1), ("S", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 154.682017042
+0
+[("H", 1), ("S", 1), ("S", 1), ("H", 1), ("S", 1), ("H", 1)]
+Done U in seconds: 136.544030459
+0
+[("S", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 151.126756
+0
+[("H", 1), ("S", 1), ("S", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 158.442409583
+0
+[("S", 1), ("S", 1), ("H", 1), ("S", 1), ("H", 1), ("I", 1)]
+Done U in seconds: 136.348465833
+0
+[("S", 1), ("S", 1), ("H", 1), ("S", 1), ("S", 1), ("H", 1)]
+Done U in seconds: 158.949132916
+0
+[("S", 1), ("S", 1), ("S", 1), ("H", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 160.214462625
+0
+[("S", 1), ("S", 1), ("H", 1), ("S", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 139.141739625
+0
+[("H", 1), ("S", 1), ("S", 1), ("H", 1), ("S", 1), ("I", 1)]
+Done U in seconds: 161.237896792
+0
+[("S", 1), ("H", 1), ("S", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 141.289712584
+0
+[("I", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 160.434671041
+0
+[("S", 1), ("H", 1), ("S", 1), ("S", 1), ("I", 1), ("I", 1)]
+Done U in seconds: 157.726857334
+0
+[("S", 1), ("S", 1), ("H", 1), ("I", 1), ("I", 1), ("I", 1)]
+
+---------
+
+arr length: 24
+all: 0
+Appeared in 10 arr amount:0
+Any[]
+Each element belongs to:
+5 → Arrays: Int64[]
+16 → Arrays: Int64[]
+20 → Arrays: Int64[]
+12 → Arrays: Int64[]
+24 → Arrays: Int64[]
+8 → Arrays: Int64[]
+17 → Arrays: Int64[]
+1 → Arrays: Int64[]
+19 → Arrays: Int64[]
+22 → Arrays: Int64[]
+23 → Arrays: Int64[]
+6 → Arrays: Int64[]
+11 → Arrays: Int64[]
+9 → Arrays: Int64[]
+14 → Arrays: Int64[]
+3 → Arrays: Int64[]
+7 → Arrays: Int64[]
+4 → Arrays: Int64[]
+13 → Arrays: Int64[]
+15 → Arrays: Int64[]
+2 → Arrays: Int64[]
+10 → Arrays: Int64[]
+18 → Arrays: Int64[]
+21 → Arrays: Int64[]
+
+Pairwise intersection matrix between arrays:
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Done in seconds: 3574.0814355
