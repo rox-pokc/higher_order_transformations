@@ -25,10 +25,30 @@ function build_stabilizer(d::Int, k::Int)
     lines = String[]
     total = 4 * k * d + 1
 
-    for i in 1:2:(4 * k * d)
-        push!(lines, "+" * repeat("I", i - 1) * repeat("X", d) * repeat("I", total - (i + d)))
-        push!(lines, "+" * repeat("I", i - 1) * repeat("Z", d) * repeat("I", total - (i + d)))
-    end
+    push!(lines, "+ZIZIIIIIIIIIIIII")
+    push!(lines, "+XIXIIIIIIIIIIIII")
+    push!(lines, "+IZIZIIIIIIIIIIII")
+    push!(lines, "+IXIXIIIIIIIIIIII")
+
+    push!(lines, "+IIIIXXIIIIIIIIII")
+    push!(lines, "+IIIIZZIIIIIIIIII")
+    push!(lines, "+IIIIIIXXIIIIIIII")
+    push!(lines, "+IIIIIIZZIIIIIIII")
+
+    push!(lines, "+IIIIIIIIZIZIIIII")
+    push!(lines, "+IIIIIIIIXIXIIIII")
+    push!(lines, "+IIIIIIIIIZIZIIII")
+    push!(lines, "+IIIIIIIIIXIXIIII")
+
+    push!(lines, "+IIIIIIIIIIIIXXII")
+    push!(lines, "+IIIIIIIIIIIIZZII")
+    push!(lines, "+IIIIIIIIIIIIIIXX")
+    push!(lines, "+IIIIIIIIIIIIIIZZ")
+
+    # for i in 1:2:(4 * k * d)
+    #     push!(lines, "+" * repeat("I", i - 1) * repeat("X", d) * repeat("I", total - (i + d)))
+    #     push!(lines, "+" * repeat("I", i - 1) * repeat("Z", d) * repeat("I", total - (i + d)))
+    # end
 
     stab_str = join(lines, "\n")
     return eval(Meta.parse("S\"\"\"$stab_str\"\"\""))
@@ -47,7 +67,7 @@ function get_cliffords(k::Int)
     if haskey(CLIFFORD_CACHE, k)
         return CLIFFORD_CACHE[k]
     else
-        filename = "cliffords_generation_outputs/cliffords_depth=4_#qubits=$(k).json"
+        filename = "cliffords_generation_outputs/cliffords_depth=2_#qubits=$(k).json"
         sequences = read_sequences_from_file(filename)
         CLIFFORD_CACHE[k] = sequences
         return sequences
@@ -61,7 +81,7 @@ function get_1q_cliffords()
 end
 
 function build_meas_stabilizer(total::Int, indexes::Vector{Int64}, meas::Char)
-    stab_char = fill('I', total)
+    stab_char = fill('I', total) 
     @inbounds for idx in indexes
         stab_char[idx] = meas
     end
@@ -134,6 +154,12 @@ function build_stabilizer_cache(d, k)
     push!(all_strings, P_XX)
     push!(all_strings, P_ZZ)
 
+    # push!(all_strings, "IIIIZIZIIIIIIIII")
+    # push!(all_strings, "IIIIIIZIZIIIIIII")
+    # push!(all_strings, "IIIIIIIIZIZIIIII")
+    # push!(all_strings, "IIIIXIXIXIXIIIII")
+
+
     first_order = 2
     second_order = 4
     for qubit in 1:k
@@ -177,6 +203,8 @@ function apply_comb(U, choi_func, d, k)
     # Initialize stabilizer state
     global_stab = build_stabilizer(d, k)
 
+    println(global_stab)
+
     # Selecting qubits that contain output
     selected_qubits = Vector{Int64}()
     first_order = 1
@@ -187,21 +215,28 @@ function apply_comb(U, choi_func, d, k)
         push!(selected_qubits, first_qubit)
         push!(selected_qubits, second_qubit)
     end
+    selected_qubits = [1, 3, 10, 12]
+    println(selected_qubits)
 
     @threads for enc_seq in cliffords
         t_id = threadid()
 
         stab = deepcopy(global_stab)
 
+        # println(stab)
+
         # Encode
         order = 3
+        # println("enc: ")
         for (g, qubits...) in enc_seq
             if length(qubits) == 1
                 qubit = qubits[1]
+                # println(1 + 2 * d * k + d * (qubit - 1))
                 apply!(stab, CLIFFORD_GATES[g](1 + 2 * d * k + d * (qubit - 1)))
             else
                 ctrl = qubits[1]
                 trgt = qubits[2]
+                # println(1 + 2 * d * k + d * (ctrl - 1), " ", 1 + 2 * d * k + d * (trgt - 1))
                 apply!(stab, CLIFFORD_GATES[g](1 + 2 * d * k + d * (ctrl - 1), 1 + 2 * d * k + d * (trgt - 1)))
             end
         end
@@ -209,6 +244,8 @@ function apply_comb(U, choi_func, d, k)
         # Bell measure 3rd and 5th qubits / 5th, 7th, 9th, 11th
         stab = project!(stab, pauli_from_cache(1))[1]
         stab = project!(stab, pauli_from_cache(2))[1]
+        # stab = project!(stab, pauli_from_cache(3))[1]
+        # stab = project!(stab, pauli_from_cache(4))[1]
 
         # Decode
         for dec_seq in cliffords
@@ -216,67 +253,82 @@ function apply_comb(U, choi_func, d, k)
             dec_stab = deepcopy(stab)
 
             order = 1
+            # println("dec: ")
             for (g, qubits...) in dec_seq
                 if length(qubits) == 1
                     qubit = qubits[1]
+                    # println(1 + d * k * (order - 1) + d * (qubit - 1))
                     apply!(dec_stab, CLIFFORD_GATES[g](1 + d * k * (order - 1) + d * (qubit - 1)))
                 else
                     ctrl = qubits[1]
                     trgt = qubits[2]
+                    # println(1 + d * k * (order - 1) + d * (ctrl - 1), " ", 1 + d * k * (order - 1) + d * (trgt - 1))
                     apply!(dec_stab, CLIFFORD_GATES[g](1 + d * k * (order - 1) + d * (ctrl - 1), 1 + d * k * (order - 1) + d * (trgt - 1)))
                 end
             end
 
             # Inject U - Clifford
             order = 4
+            # println("inj U")
             for qubit in 1:k
-                qubit = 1 + (order - 1) * d * k + d * (qubit - 1)
+                # qubit = 1 + (order - 1) * d * k + d * (qubit - 1)
+                # println(qubit)
                 for (g, index) in U
-                    apply!(dec_stab, CLIFFORD_GATES[g](qubit))
+                    apply!(dec_stab, CLIFFORD_GATES[g]( 1 + (order - 1) * d * k + d * (qubit - 1)))
+                end
+                if (qubit == 1)
+                    dec_stab = project!(dec_stab, pauli_from_cache(5))[1]
+                    dec_stab = project!(dec_stab, pauli_from_cache(6))[1]
+                    dec_stab = project!(dec_stab, pauli_from_cache(9))[1]
+                    dec_stab = project!(dec_stab, pauli_from_cache(10))[1]
+                end
+                if (qubit == 2)
+                    dec_stab = project!(dec_stab, pauli_from_cache(7))[1]
+                    dec_stab = project!(dec_stab, pauli_from_cache(8))[1]
+                    dec_stab = project!(dec_stab, pauli_from_cache(11))[1]
+                    dec_stab = project!(dec_stab, pauli_from_cache(12))[1]
                 end
             end
 
             # Bell measure 
-            for i in 3:length(PAULI_CACHE)
-                dec_stab = project!(dec_stab, pauli_from_cache(i))[1]
-            end
-            # dec_stab = project!(dec_stab, pauli_from_cache(3))[1]
-            # dec_stab = project!(dec_stab, pauli_from_cache(4))[1]
-            # dec_stab = project!(dec_stab, pauli_from_cache(5))[1]
-            # dec_stab = project!(dec_stab, pauli_from_cache(6))[1]
-
-            # println("maes ", dec_stab)
-        
-            # Bell measure
-            # comb.stab = project!(comb.stab, pauli_from_cache(7))[1]
-            # comb.stab = project!(comb.stab, pauli_from_cache(8))[1]
-            # comb.stab = project!(comb.stab, pauli_from_cache(9))[1]
-            # comb.stab = project!(comb.stab, pauli_from_cache(10))[1]
+            # for i in 3:length(PAULI_CACHE)
+            #     dec_stab = project!(dec_stab, pauli_from_cache(i))[1]
+            # end
 
             # Reduce stabilizers
             canonicalize!(dec_stab)
 
-            #Checking stabilizers
-            partial_strs = extract_partial_stabilizers(dec_stab, selected_qubits)
-            nontrivial = filter(x -> x[2:length(selected_qubits)+1] != repeat("_", length(selected_qubits)), partial_strs)
+            selected = [[1, 10], [1, 12], [3, 10], [3, 12]]
 
-            flag = 0
-            for out_stab in nontrivial
-                out_stab = replace(out_stab, '_' => 'I')
-                sign = out_stab[1] == '-' ? -1 : 1
-                body = out_stab[2:end]
-                ops = [PAULI_GATES[c] for c in body]
-                operator = foldl(kron, ops)
-                transformed = operator * choi_func
-                if (isapprox(transformed, sign * choi_func))
-                    flag += 1 
+            for selected_qubits in selected
+
+                #Checking stabilizers
+                partial_strs = extract_partial_stabilizers(dec_stab, selected_qubits)
+                nontrivial = filter(x -> x[2:length(selected_qubits)+1] != repeat("_", length(selected_qubits)), partial_strs)
+
+                if (length(nontrivial) == 2)
+                    println(dec_stab)
+                    println("HRERERERERERER selected: ", selected_qubits, " non trivial ", nontrivial)
+                end
+
+                flag = 0 
+                for out_stab in nontrivial
+                    out_stab = replace(out_stab, '_' => 'I')
+                    sign = out_stab[1] == '-' ? -1 : 1
+                    body = out_stab[2:end]
+                    ops = [PAULI_GATES[c] for c in body]
+                    operator = foldl(kron, ops)
+                    transformed = operator * choi_func
+                    if (isapprox(transformed, sign * choi_func))
+                        flag += 1 
+                    end
+                end
+                if (flag == length(nontrivial))
+                    # println("PUSHING ", nontrivial)
+                    comb = Comb(dec_stab, enc_seq, dec_seq)
+                    push!(buffers[t_id], comb)
                 end
             end
-            if (flag == length(nontrivial))
-                comb = Comb(dec_stab, enc_seq, dec_seq)
-                push!(buffers[t_id], comb)
-            end
-            
         end
         
     end
@@ -294,7 +346,7 @@ func = conj
 
 println(Threads.nthreads())
 
-file = open("outputs/k=$(k)/output_func=$(func)_d=$(d)_k=$(k)_depth=4.txt", "w")
+file = open("outputs/k=$(k)/output_func=$(func)_d=$(d)_k=$(k)_depth=2_test.txt", "w")
 
 println(file, "Start:")
 flush(file)
@@ -303,45 +355,53 @@ println("Started at: ", now())
 
 build_stabilizer_cache(d, k)
 
+for i in 1:length(PAULI_CACHE)
+    println(pauli_from_cache(i))
+end
+
 arrays = []
 U_cliffords = get_1q_cliffords()
 global i = 1
 for U in U_cliffords
-    combs = []
+    if (i == 1)
+        combs = []
 
-    U_arr = [CLIFFORD_MATRICES[g] for (g, qubit) in U]
-    U_combined = reduce(*, U_arr)
-    choi_func_U = get_choi(func(kron(U_combined, U_combined)), d^2)
-    # choi_func_U = get_choi(func(U_combined), d)
+        U_arr = [CLIFFORD_MATRICES[g] for (g, qubit) in U]
+        U_combined = reduce(*, U_arr)
+        # choi_func_U = get_choi(func(kron(U_combined, U_combined)), d^2)
+        choi_func_U = get_choi(func(U_combined), d)
 
-    println("Processing ", i, "/", length(U_cliffords))
+        println(choi_func_U)
 
-    start_time_comb = time_ns()
-    combs = apply_comb(U, choi_func_U, d, k)
-    end_time_comb = time_ns()
+        println("Processing ", i, "/", length(U_cliffords))
 
-    println(file, "Done U in seconds: ", (end_time_comb - start_time_comb) / 1e9)
-    flush(file)
+        start_time_comb = time_ns()
+        combs = apply_comb(U, choi_func_U, d, k)
+        end_time_comb = time_ns()
 
-    global i += 1
-
-    println(file, length(combs))
-    flush(file)
-    println(file, U)
-    flush(file)
-    seen = Set{Tuple{Vector{Tuple{String, Vararg{Int}}}, Vector{Tuple{String, Vararg{Int}}}}}()
-    for comb in combs
-        key = (comb.enc, comb.dec)
-        if key ∉ seen
-            push!(seen, key)
-        end
-    end
-    for comb in seen
-        println(file, comb)
+        println(file, "Done U in seconds: ", (end_time_comb - start_time_comb) / 1e9)
         flush(file)
-    end
 
-    push!(arrays, combs)
+        global i += 1
+
+        println(file, length(combs))
+        flush(file)
+        println(file, U)
+        flush(file)
+        seen = Set{Tuple{Vector{Tuple{String, Vararg{Int}}}, Vector{Tuple{String, Vararg{Int}}}}}()
+        for comb in combs
+            key = (comb.enc, comb.dec)
+            if key ∉ seen
+                push!(seen, key)
+            end
+        end
+        for comb in seen
+            println(file, comb)
+            flush(file)
+        end
+
+        push!(arrays, combs)
+    end
 end
 
 println(file)
