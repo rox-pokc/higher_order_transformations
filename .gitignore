@@ -20,3 +20,6 @@ Manifest.toml
 
 # macOS specific folders
 __MACOSX/
+
+# Ignore leftovers from Idea
+.idea/

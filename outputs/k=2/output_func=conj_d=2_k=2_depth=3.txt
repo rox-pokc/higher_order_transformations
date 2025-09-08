@@ -1,0 +1,70 @@
+Start:
+Done U in seconds: 10.886335875
+Done U in seconds: 9.428172958
+Done U in seconds: 8.103198083
+Done U in seconds: 8.171545083
+Done U in seconds: 9.131796
+Done U in seconds: 9.41834525
+Done U in seconds: 9.355392625
+Done U in seconds: 9.193584708
+Done U in seconds: 8.22171025
+Done U in seconds: 9.529812
+Done U in seconds: 9.547425417
+Done U in seconds: 8.112505125
+Done U in seconds: 9.42937325
+Done U in seconds: 8.182315584
+Done U in seconds: 9.118418333
+Done U in seconds: 9.480143875
+Done U in seconds: 8.099560625
+Done U in seconds: 9.395097875
+Done U in seconds: 9.429609208
+Done U in seconds: 8.128753959
+Done U in seconds: 9.475004917
+Done U in seconds: 8.134253583
+Done U in seconds: 9.421866375
+Done U in seconds: 9.12221
+
+---------
+
+arr length: 24
+all: 0
+Appeared in 10 arr amount:0
+Any[]
+Each element belongs to:
+5 → Arrays: Int64[]
+16 → Arrays: Int64[]
+20 → Arrays: Int64[]
+12 → Arrays: Int64[]
+24 → Arrays: Int64[]
+8 → Arrays: Int64[]
+17 → Arrays: Int64[]
+1 → Arrays: Int64[]
+19 → Arrays: Int64[]
+22 → Arrays: Int64[]
+23 → Arrays: Int64[]
+6 → Arrays: Int64[]
+11 → Arrays: Int64[]
+9 → Arrays: Int64[]
+14 → Arrays: Int64[]
+3 → Arrays: Int64[]
+7 → Arrays: Int64[]
+4 → Arrays: Int64[]
+13 → Arrays: Int64[]
+15 → Arrays: Int64[]
+2 → Arrays: Int64[]
+10 → Arrays: Int64[]
+18 → Arrays: Int64[]
+21 → Arrays: Int64[]
+
+Pairwise intersection matrix between arrays:
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Set{Int64}()
+Done in seconds: 219.895154458
